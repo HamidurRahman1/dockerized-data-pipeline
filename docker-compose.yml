@@ -1,0 +1,67 @@
+version: '3'
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:latest
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:pass@airflow-postgres/airflow
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:pass@airflow-postgres/airflow
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session'
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: 'America/New_York'
+  volumes:
+    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/data:/data
+    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/dags:/opt/airflow/dags
+    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/logs:/opt/airflow/logs
+    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/plugins:/opt/airflow/plugins
+  depends_on:
+    &airflow-common-depends-on
+    airflow-postgres:
+      condition: service_healthy
+
+services:
+  airflow-postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: airflow
+      TZ: 'America/New_York'
+      PGTZ: 'America/New_York'
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 30s
+      retries: 3
+    ports:
+      - "5432:5432"
+    volumes:
+      - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/pgdata/airflow-metadb:/var/lib/postgresql/data
+    restart: always
+
+  airflow-webserver:
+    <<: *airflow-common
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db init;
+        airflow users create --username admin --password admin --firstname Hamidur --lastname Rahman --role Admin --email admin@example.com;
+        airflow webserver;
+
+  airflow-scheduler:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow scheduler;
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
