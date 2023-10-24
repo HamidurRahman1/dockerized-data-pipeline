@@ -5,17 +5,18 @@ x-airflow-common:
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:pass@airflow-postgres/airflow
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:pass@airflow-postgres/airflow
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session'
+    AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: 'false'
     AIRFLOW__CORE__DEFAULT_TIMEZONE: 'America/New_York'
+    AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session'
+    AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_META_DB_USERNAME}:${AIRFLOW_META_DB_PASS}@airflow-postgres/${AIRFLOW_META_DB}
   volumes:
-    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/data:/data
-    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/dags:/opt/airflow/dags
-    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/logs:/opt/airflow/logs
-    - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/plugins:/opt/airflow/plugins
+    - ${MOUNT_VOL}/data:/data
+    - ${MOUNT_VOL}/dags:/opt/airflow/dags
+    - ${MOUNT_VOL}/logs:/opt/airflow/logs
   depends_on:
     &airflow-common-depends-on
     airflow-postgres:
@@ -25,19 +26,19 @@ services:
   airflow-postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: airflow
+      POSTGRES_USER: ${AIRFLOW_META_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AIRFLOW_META_DB_PASS}
+      POSTGRES_DB: ${AIRFLOW_META_DB}
       TZ: 'America/New_York'
       PGTZ: 'America/New_York'
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "${AIRFLOW_META_DB_USERNAME}"]
       interval: 30s
       retries: 3
     ports:
       - "5432:5432"
     volumes:
-      - /Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/pgdata/airflow-metadb:/var/lib/postgresql/data
+      - ${MOUNT_VOL}/pgdata/airflow-metadb:/var/lib/postgresql/data
     restart: always
 
   airflow-webserver:
@@ -52,7 +53,8 @@ services:
       - -c
       - |
         airflow db init;
-        airflow users create --username admin --password admin --firstname Hamidur --lastname Rahman --role Admin --email admin@example.com;
+        airflow users create --role Admin --username ${AIRFLOW_WEBSERVER_USERNAME} --password ${AIRFLOW_WEBSERVER_PASS} \
+          --firstname Hamidur --lastname Rahman --email admin@example.com;
         airflow webserver;
 
   airflow-scheduler:
