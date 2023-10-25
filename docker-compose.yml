@@ -10,7 +10,7 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: 'false'
     AIRFLOW__CORE__DEFAULT_TIMEZONE: 'America/New_York'
     AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
-    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_META_DB_USERNAME}:${AIRFLOW_META_DB_PASS}@airflow-postgres/${AIRFLOW_META_DB}
   volumes:
@@ -36,15 +36,17 @@ services:
       interval: 30s
       retries: 3
     ports:
-      - "5432:5432"
+      - "5000:5432"
     volumes:
       - ${MOUNT_VOL}/pgdata/airflow-metadb:/var/lib/postgresql/data
     restart: always
+    networks:
+      - dd-pipeline
 
   airflow-webserver:
     <<: *airflow-common
     ports:
-      - "8080:8080"
+      - "8000:8080"
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -56,6 +58,8 @@ services:
         airflow users create --role Admin --username ${AIRFLOW_WEBSERVER_USERNAME} --password ${AIRFLOW_WEBSERVER_PASS} \
           --firstname Hamidur --lastname Rahman --email admin@example.com;
         airflow webserver;
+    networks:
+      - dd-pipeline
 
   airflow-scheduler:
     <<: *airflow-common
@@ -67,3 +71,5 @@ services:
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
+    networks:
+      - dd-pipeline
