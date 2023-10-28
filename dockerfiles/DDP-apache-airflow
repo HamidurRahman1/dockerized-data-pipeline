@@ -1,0 +1,15 @@
+
+FROM apache/airflow:latest
+
+ENV TZ=America/New_York
+
+ENV AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+ENV AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true'
+ENV AIRFLOW__CORE__LOAD_EXAMPLES='false'
+ENV AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS='false'
+ENV AIRFLOW__CORE__DEFAULT_TIMEZONE='America/New_York'
+ENV AIRFLOW__API__ENABLE_EXPERIMENTAL_API='false'
+ENV AIRFLOW__API__AUTH_BACKENDS='airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
+ENV AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS='false'
+
+USER airflow
