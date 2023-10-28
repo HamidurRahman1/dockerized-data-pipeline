@@ -1,3 +1,9 @@
 # dockerized-data-pipeline
 
-Work in progress ...
+Temporarily run the compose file by running
+`docker-compose --env-file dev.env up`
+
+<h2>Work in progress ...</h2>
+
+
+
