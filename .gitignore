@@ -2,7 +2,7 @@
 data/
 logs/
 plugins/
-pgdata/
+dbdata/
 
 
 .idea/

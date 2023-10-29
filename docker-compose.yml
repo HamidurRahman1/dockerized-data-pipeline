@@ -4,6 +4,7 @@ x-airflow-common:
   &airflow-common
   image: apache/airflow:latest
   environment:
+    &airflow-common-env
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -21,6 +22,7 @@ x-airflow-common:
     - ${MOUNT_VOL}/dags:/opt/airflow/dags
     - ${MOUNT_VOL}/logs:/opt/airflow/logs
   depends_on:
+    &airflow-metadb-depends-on
     airflow-postgres-metadb:
       condition: service_healthy
 
@@ -40,7 +42,7 @@ services:
     ports:
       - "5000:5432"
     volumes:
-      - ${MOUNT_VOL}/pgdata/airflow-metadb:/var/lib/postgresql/data
+      - ${MOUNT_VOL}/dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
     restart: always
     networks:
       - ddp
@@ -59,7 +61,7 @@ services:
       - "8000:8080"
     restart: always
     depends_on:
-      - airflow-postgres-metadb
+      <<: *airflow-metadb-depends-on
     networks:
       - ddp
 
@@ -72,9 +74,22 @@ services:
         airflow scheduler;
     restart: always
     depends_on:
-      - airflow-postgres-metadb
+      <<: *airflow-metadb-depends-on
     networks:
       - ddp
+
+  celery-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASS}
+    volumes:
+      - ${MOUNT_VOL}/dbdata/redis-metadb:/data
+    networks:
+      - ddp
+
 
 networks:
   ddp:
