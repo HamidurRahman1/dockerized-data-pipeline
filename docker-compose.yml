@@ -2,9 +2,7 @@ version: '3'
 
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:latest
   environment:
-    &airflow-common-env
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -37,7 +35,7 @@ services:
       PGTZ: ${TMZ}
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "${AF_META_DB_USERNAME}" ]
-      interval: 30s
+      interval: 120s
       retries: 3
     ports:
       - "5000:5432"
@@ -49,6 +47,7 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
+    image: ddp-airflow:v1
     entrypoint: /bin/bash
     command:
       - -c
@@ -67,6 +66,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    image: ddp-airflow:v1
     entrypoint: /bin/bash
     command:
       - -c
@@ -77,19 +77,6 @@ services:
       <<: *airflow-metadb-depends-on
     networks:
       - ddp
-
-  celery-redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    command: redis-server
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASS}
-    volumes:
-      - ${MOUNT_VOL}/dbdata/redis-metadb:/data
-    networks:
-      - ddp
-
 
 networks:
   ddp:
