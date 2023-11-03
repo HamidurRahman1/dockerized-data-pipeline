@@ -1,4 +1,5 @@
 import datetime
+import glob
 import requests
 import shutil
 from airflow import DAG
@@ -23,7 +24,7 @@ dag = DAG(
 )
 
 
-def _download_failed_banks_info(url, download_dir: str):
+def _download_failed_banks_info(url: str, download_dir: str):
 
     downloaded_filename = "failed_banks.csv." + datetime.datetime.now().strftime('%m_%d_%Y_%I_%M_%S_%p_unprocessed')
 
@@ -40,6 +41,12 @@ def _download_failed_banks_info(url, download_dir: str):
         print(f"Failed to download the file: {url}. Status code: {response.status_code}")
 
 
+def _process_failed_banks_data(downloaded_data_dir: str):
+    print(downloaded_data_dir)
+    unprocessed_files = glob.glob(downloaded_data_dir + '/failed_banks' + '*' + '_unprocessed')
+    print("Total unprocessed files: " + str(unprocessed_files))
+
+
 download_failed_banks_data = PythonOperator(
     task_id="download_failed_banks_data",
     python_callable=_download_failed_banks_info,
@@ -50,5 +57,14 @@ download_failed_banks_data = PythonOperator(
     dag=dag
 )
 
-download_failed_banks_data
+process_data = PythonOperator(
+    task_id="process_failed_banks_data",
+    python_callable=_process_failed_banks_data,
+    op_kwargs={
+        "downloaded_data_dir": "/data/landing/"
+    },
+    dag=dag
+)
+
+download_failed_banks_data >> process_data
 
