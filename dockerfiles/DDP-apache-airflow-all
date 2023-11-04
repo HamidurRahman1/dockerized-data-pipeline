@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y wget
 
 RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - \
     && echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb buster main" | tee /etc/apt/sources.list.d/adoptopenjdk.list \
-    && apt-get update && apt-get install -y adoptopenjdk-${JAVA8_VERSION}-hotspot
+    && apt-get update && apt-get install -y adoptopenjdk-${JAVA8_VERSION}-hotspot \
     && ln -s /usr/lib/jvm/adoptopenjdk-${JAVA8_VERSION}-hotspot-amd64 $JAVA_HOME
 
 RUN wget -q "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_SPARK_VERSION}.tgz" -O spark.tgz \
