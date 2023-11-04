@@ -11,12 +11,12 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="check_java_spark_versions",
+    dag_id="check_versions",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     schedule_interval=datetime.timedelta(days=1),
     catchup=False,
     max_active_runs=1,
-    max_active_tasks=3,
+    max_active_tasks=5,
     default_args=default_args,
     tags=["basic"]
 )
@@ -45,4 +45,10 @@ spark_submit_version = BashOperator(
     dag=dag
 )
 
-start >> [java_version, spark_shell_version, spark_submit_version]
+groovy_version = BashOperator(
+    task_id="check_groovy_version",
+    bash_command="echo `groovy --version`",
+    dag=dag
+)
+
+start >> [java_version, spark_shell_version, spark_submit_version, groovy_version]
