@@ -16,7 +16,7 @@ dag = DAG(
     dag_id="download_and_process_failed_banks",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     # template_searchpath="/scripts",
-    schedule_interval=datetime.timedelta(weeks=1),
+    schedule_interval=None,
     catchup=False,
     max_active_runs=1,
     max_active_tasks=1,
@@ -46,6 +46,31 @@ def _process_failed_banks_data(downloaded_data_dir: str):
     unprocessed_files = glob.glob(downloaded_data_dir + '/failed_banks' + '*' + '_unprocessed')
     print("Total unprocessed files: " + str(unprocessed_files))
 
+    if len(unprocessed_files) == 0:
+        print("There are no unprocessed files.")
+        return
+
+    processed_files = []
+    error_files = []
+
+    for file in unprocessed_files:
+        try:
+            print(f"Starting to process {file}")
+            with open(file, encoding='windows-1252', mode='r') as unprocessed_file:
+                lines = unprocessed_file.readlines()
+                for i in range(len(lines)):
+                    # logic TBA
+                    print("\t".join(lines[i].split(",")))
+                print(f"Done processing {file}.")
+        except Exception as ex:
+            print(str(ex))
+            error_files.append(file)
+            continue
+        processed_files.append(file)
+
+    print(f"Following files were processed successfully - {processed_files}")
+    print(f"Following files were unprocessed due to errors - {error_files}")
+
 
 download_failed_banks_data = PythonOperator(
     task_id="download_failed_banks_data",
@@ -67,4 +92,3 @@ process_data = PythonOperator(
 )
 
 download_failed_banks_data >> process_data
-
