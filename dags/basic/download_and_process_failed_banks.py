@@ -20,7 +20,8 @@ dag = DAG(
     catchup=False,
     max_active_runs=1,
     max_active_tasks=1,
-    default_args=default_args
+    default_args=default_args,
+    tags=["basic"]
 )
 
 
