@@ -11,12 +11,10 @@ ENV JAVA8_VERSION=8
 ENV MAVEN_VERSION=3.8.4
 ENV SPARK_VERSION=3.2.1
 ENV HADOOP_SPARK_VERSION=3.2
-ENV HADOOP_VERSION=3.2.4
 
 ENV JAVA_HOME=/opt/java8
 ENV MAVEN_HOME=/opt/maven
 ENV SPARK_HOME=/opt/spark
-ENV HADOOP_HOME=/opt/hadoop
 
 RUN apt-get update && apt-get install -y wget
 
