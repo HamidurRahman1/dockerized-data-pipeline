@@ -1,0 +1,82 @@
+version: '3'
+
+x-airflow-common:
+  &airflow-common
+  environment:
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
+    AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: 'false'
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: ${TMZ}
+    AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
+  volumes:
+    - ${MOUNT_VOL}/scripts:/scripts
+    - ${MOUNT_VOL}/data/landing:/data/landing
+    - ${MOUNT_VOL}/data/processed:/data/processed
+    - ${MOUNT_VOL}/data/archive:/data/archive
+    - ${MOUNT_VOL}/dags:/opt/airflow/dags
+    - ${MOUNT_VOL}/logs:/opt/airflow/logs
+  depends_on:
+    &airflow-metadb-depends-on
+    airflow-postgres-metadb:
+      condition: service_healthy
+
+services:
+  airflow-postgres-metadb:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${AF_META_DB_USERNAME}
+      POSTGRES_PASSWORD: ${AF_META_DB_PASS}
+      POSTGRES_DB: ${AF_META_DB}
+      TZ: ${TMZ}
+      PGTZ: ${TMZ}
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${AF_META_DB_USERNAME}" ]
+      interval: 120s
+      retries: 3
+    ports:
+      - "5000:5432"
+    volumes:
+      - ${MOUNT_VOL}/dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - ddp
+
+  airflow-webserver:
+    <<: *airflow-common
+    image: ddp-airflow-all:v1
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db init;
+        airflow users create --role ${AF_ROLE} --username ${AF_USERNAME} --password ${AF_PASS} \
+          --firstname ${AF_FIRSTNAME} --lastname ${AF_LASTNAME} --email ${AF_EMAIL};
+        airflow webserver;
+    ports:
+      - "8000:8080"
+    restart: always
+    depends_on:
+      <<: *airflow-metadb-depends-on
+    networks:
+      - ddp
+
+  airflow-scheduler:
+    <<: *airflow-common
+    image: ddp-airflow-all:v1
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow scheduler;
+    restart: always
+    depends_on:
+      <<: *airflow-metadb-depends-on
+    networks:
+      - ddp
+
+networks:
+  ddp:
