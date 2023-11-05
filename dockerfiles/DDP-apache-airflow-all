@@ -3,7 +3,9 @@ FROM apache/airflow:slim-2.7.2-python3.9
 
 ENV TZ=America/New_York
 
-RUN pip install apache-airflow-providers-postgres
+RUN pip install apache-airflow-providers-postgres \
+    && pip install redis \
+    && pip install --upgrade pip
 
 USER root
 
@@ -20,12 +22,12 @@ ENV SPARK_HOME=/opt/spark
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y \
-    ca-certificates \
-    locales \
-    curl \
-    wget \
-    zip \
-    unzip \
+        ca-certificates \
+        locales \
+        curl \
+        wget \
+        zip \
+        unzip \
     && apt-get update
 
 RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - \
@@ -33,6 +35,7 @@ RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | a
     && apt-get update && apt-get install -y adoptopenjdk-${JAVA8_VERSION}-hotspot \
     && ln -s /usr/lib/jvm/adoptopenjdk-${JAVA8_VERSION}-hotspot-amd64 $JAVA_HOME
 
+# as of this development update java PATH should be set before installing groovy otherwise groovy is going to install java11
 ENV PATH $PATH:$JAVA_HOME/bin
 
 RUN apt-get update && apt-get install -y groovy \

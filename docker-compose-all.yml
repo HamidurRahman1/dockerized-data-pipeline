@@ -78,5 +78,15 @@ services:
     networks:
       - ddp
 
+  celery-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server
+    volumes:
+      - ${MOUNT_VOL}/dbdata/redis-metadb:/data
+    networks:
+      - ddp
+
 networks:
   ddp:
