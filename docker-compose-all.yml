@@ -3,9 +3,11 @@ version: '3'
 x-airflow-common:
   &airflow-common
   environment:
+    AIRFLOW__CELERY__BROKER_URL: ${CELERY_BROKER_URL}
+    AIRFLOW__CELERY__RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
     AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: 'false'
-    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: 'false'
@@ -35,7 +37,7 @@ services:
       PGTZ: ${TMZ}
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "${AF_META_DB_USERNAME}" ]
-      interval: 120s
+      interval: 30s
       retries: 3
     ports:
       - "5000:5432"
@@ -85,6 +87,28 @@ services:
     command: redis-server
     volumes:
       - ${MOUNT_VOL}/dbdata/redis-metadb:/data
+    networks:
+      - ddp
+
+  celery-worker-n1:
+    <<: *airflow-common
+    image: ddp-airflow-all:v1
+    restart: always
+    depends_on:
+      - airflow-scheduler
+    command: celery worker
+    networks:
+      - ddp
+
+  celery-flower:
+    <<: *airflow-common
+    image: ddp-airflow-all:v1
+    restart: always
+    depends_on:
+      - celery-worker-n1
+    ports:
+      - "9000:5555"
+    command: celery flower
     networks:
       - ddp
 

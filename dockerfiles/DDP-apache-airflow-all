@@ -5,6 +5,7 @@ ENV TZ=America/New_York
 
 RUN pip install apache-airflow-providers-postgres \
     && pip install redis \
+    && pip install apache-airflow-providers-celery \
     && pip install --upgrade pip
 
 USER root
