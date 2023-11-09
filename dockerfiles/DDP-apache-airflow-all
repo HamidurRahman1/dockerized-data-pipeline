@@ -40,6 +40,13 @@ RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sud
 # as of this development java PATH should be set before installing groovy otherwise groovy is going to install java11 and set it in env
 ENV PATH $PATH:$JAVA_HOME/bin
 
+RUN mkdir -p $MAVEN_HOME \
+     && curl -fsSL -o /opt/apache-maven.tar.gz https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+     && tar -xzf /opt/apache-maven.tar.gz -C $MAVEN_HOME --strip-components=1 \
+     && rm -f /opt/apache-maven.tar.gz
+
+ENV PATH $PATH:$MAVEN_HOME/bin
+
 RUN apt-get update && apt-get install -y groovy \
     && ln -s /usr/share/groovy $GROOVY_HOME
 
