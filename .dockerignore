@@ -1,0 +1,7 @@
+**/.idea
+**/target
+**/__pycache__
+**/.DS_Store
+**/.iml
+**/venv
+**/.gitignore
