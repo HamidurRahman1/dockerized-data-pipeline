@@ -13,6 +13,7 @@
   </properties>
 
   <modules>
+    <module>ddp-hibernate</module>
   </modules>
 
 </project>
