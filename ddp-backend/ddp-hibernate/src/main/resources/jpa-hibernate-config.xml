@@ -14,9 +14,9 @@
     http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:annotation-config/>
-    <context:component-scan base-package="hrahman.ddp.hibernate.service"/>
+    <context:component-scan base-package="hrahman.ddp.hibernate.services"/>
 
-    <jpa:repositories base-package="hrahman.ddp.hibernate.repos"/>
+    <jpa:repositories base-package="hrahman.ddp.hibernate.repositories"/>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSourceBean" />
