@@ -15,6 +15,7 @@
 
   <modules>
     <module>ddp-hibernate</module>
+    <module>ddp-rest</module>
   </modules>
 
 </project>
