@@ -12,8 +12,8 @@ USER root
 
 ARG JAVA8_VERSION=8
 ARG MAVEN_VERSION=3.8.4
-ARG SPARK_VERSION=3.2.1
-ARG HADOOP_SPARK_VERSION=3.2
+ARG SPARK_VERSION=3.3.1
+ARG HADOOP_SPARK_VERSION=3
 
 ENV GROOVY_HOME=/opt/groovy
 ENV JAVA_HOME=/opt/java8
@@ -34,8 +34,8 @@ RUN apt-get update \
 RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo apt-key add - \
     && echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | sudo tee /etc/apt/sources.list.d/adoptium.list \
     && apt-get update \
-    && apt-get install temurin-${JAVA8_VERSION}-jre -y \
-    && ln -s /usr/lib/jvm/temurin-${JAVA8_VERSION}-jre-amd64 $JAVA_HOME
+    && apt-get install temurin-${JAVA8_VERSION}-jdk -y \
+    && ln -s /usr/lib/jvm/temurin-${JAVA8_VERSION}-jdk-amd64 $JAVA_HOME
 
 # as of this development java PATH should be set before installing groovy otherwise groovy is going to install java11 and set it in env
 ENV PATH $PATH:$JAVA_HOME/bin
@@ -58,6 +58,15 @@ RUN wget -q "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-
     && rm spark.tgz
 
 ENV PATH $PATH:$SPARK_HOME/bin
+
+RUN mkdir -p /app/ddp-backend/ /app/jars/ddp-hibernate /app/jars/ddp-rest /app/jars/ddp-spark/lib \
+    && chmod 777 -R /app
+
+COPY ../ddp-backend/ /app/ddp-backend
+
+WORKDIR /app/ddp-backend
+
+RUN mvn clean install -Plocal -U -DskipTests
 
 RUN apt-get update \
     && apt-get clean \
