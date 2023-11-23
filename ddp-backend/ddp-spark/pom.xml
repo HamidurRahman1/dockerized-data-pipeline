@@ -15,7 +15,6 @@
   <name>ddp-spark</name>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <scala.compatibility.version>2.13</scala.compatibility.version>
     <scala.version>${scala.compatibility.version}.10</scala.version>
     <spark.version>3.3.1</spark.version>
@@ -52,13 +51,6 @@
   <build>
 
     <sourceDirectory>src/main/scala</sourceDirectory>
-
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
 
     <plugins>
 
