@@ -4,23 +4,23 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "test_table")
+@Table(name = "test_table", schema = "ddp_schema")
 public class TestEntity {
 
     @Id
-    @Column(name = "test_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer testId;
+    private Integer id;
 
     @Column(name = "value")
     private String value;
 
-    public Integer getTestId() {
-        return testId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setTestId(Integer testId) {
-        this.testId = testId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getValue() {
@@ -36,18 +36,18 @@ public class TestEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TestEntity that = (TestEntity) o;
-        return Objects.equals(testId, that.testId) && Objects.equals(value, that.value);
+        return Objects.equals(id, that.id) && Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(testId, value);
+        return Objects.hash(id, value);
     }
 
     @Override
     public String toString() {
         return "TestEntity{" +
-                "testId=" + testId +
+                "id=" + id +
                 ", value='" + value + '\'' +
                 '}';
     }

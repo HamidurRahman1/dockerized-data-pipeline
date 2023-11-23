@@ -10,6 +10,10 @@ RUN pip install apache-airflow-providers-postgres \
 
 USER root
 
+ARG DB_URL
+ARG DB_USER
+ARG DB_PASS
+
 ARG JAVA8_VERSION=8
 ARG MAVEN_VERSION=3.8.4
 ARG SPARK_VERSION=3.3.1
@@ -66,7 +70,7 @@ COPY ../ddp-backend/ /app/ddp-backend
 
 WORKDIR /app/ddp-backend
 
-RUN mvn clean install -Plocal -U -DskipTests
+RUN mvn clean install -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
 
 RUN apt-get update \
     && apt-get clean \
