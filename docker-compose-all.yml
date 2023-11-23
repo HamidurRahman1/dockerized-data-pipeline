@@ -47,6 +47,23 @@ services:
     networks:
       - ddp
 
+  ddp-postgres-metadb:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DDP_META_DB_USERNAME}
+      POSTGRES_PASSWORD: ${DDP_META_DB_PASS}
+      POSTGRES_DB: ${DDP_META_DB}
+      TZ: ${TMZ}
+      PGTZ: ${TMZ}
+    ports:
+      - "5050:5432"
+    volumes:
+      - ${MOUNT_VOL}/dbdata/postgres-metadb:/var/lib/postgresql/data
+      - ${MOUNT_VOL}/scripts/ddp_metadb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    networks:
+      - ddp
+
   airflow-webserver:
     <<: *airflow-common
     image: ddp-airflow-all:v1
