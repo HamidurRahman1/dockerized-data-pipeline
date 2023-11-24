@@ -28,6 +28,7 @@ x-airflow-common:
 
 services:
   airflow-postgres-metadb:
+    container_name: ${DDP_AF_PG_METADB_NAME}
     image: postgres:15
     environment:
       POSTGRES_USER: ${AF_META_DB_USERNAME}
@@ -48,6 +49,7 @@ services:
       - ddp
 
   ddp-postgres-metadb:
+    container_name: ${DDP_PG_METADB_NAME}
     image: postgres:15
     environment:
       POSTGRES_USER: ${DDP_META_DB_USERNAME}
@@ -66,6 +68,7 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
+    container_name: ${DDP_AF_PG_WEBSERVER_NAME}
     image: ddp-airflow-all:v1
     entrypoint: /bin/bash
     command:
@@ -85,6 +88,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    container_name: ${DDP_AF_PG_SCHEDULER_NAME}
     image: ddp-airflow-all:v1
     entrypoint: /bin/bash
     command:
@@ -98,6 +102,7 @@ services:
       - ddp
 
   celery-redis:
+    container_name: ${DDP_REDIS_NAME}
     image: redis:latest
     ports:
       - "6379:6379"
@@ -109,6 +114,7 @@ services:
 
   celery-worker-n1:
     <<: *airflow-common
+    container_name: ${DDP_CELERY_WORKER_1_NAME}
     image: ddp-airflow-all:v1
     restart: always
     depends_on:
@@ -119,6 +125,7 @@ services:
 
   celery-flower:
     <<: *airflow-common
+    container_name: ${DDP_CELERY_FLOWER_NAME}
     image: ddp-airflow-all:v1
     restart: always
     depends_on:
@@ -131,6 +138,7 @@ services:
 
   ddp-rest-api:
     <<: *airflow-common
+    container_name: ${DDP_REST_API_NAME}
     image: ddp-airflow-all:v1
     entrypoint: /bin/bash
     command:
