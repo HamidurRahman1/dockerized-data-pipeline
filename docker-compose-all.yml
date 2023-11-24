@@ -129,5 +129,20 @@ services:
     networks:
       - ddp
 
+  ddp-rest-api:
+    <<: *airflow-common
+    image: ddp-airflow-all:v1
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - java -jar /app/jars/ddp-rest/ddp-rest-1.0.jar
+    restart: always
+    depends_on:
+      - ddp-postgres-metadb
+    ports:
+      - "7000:7000"
+    networks:
+      - ddp
+
 networks:
   ddp:
