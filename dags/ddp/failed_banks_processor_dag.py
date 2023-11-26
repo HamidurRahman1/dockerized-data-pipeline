@@ -1,9 +1,11 @@
 import datetime
+import json
 import requests
 import shutil
 from airflow import DAG
 
 from airflow.operators.python import PythonOperator
+from airflow.providers.http.operators.http import SimpleHttpOperator
 
 default_args = {
     "owner": "Hamid",
@@ -33,7 +35,7 @@ def _download_failed_banks_info(url: str, download_dir: str, **context):
         "url": url,
         "download_dir": download_dir,
         "filename": downloaded_filename,
-        "status": response.status_code
+        "http_status": response.status_code
     }
 
     if response.status_code == 200:
@@ -46,7 +48,7 @@ def _download_failed_banks_info(url: str, download_dir: str, **context):
     else:
         print(f"Failed to download the file: {url}. Status code: {response.status_code}")
 
-    context['ti'].xcom_push(key='file_info', value=file_info)
+    context['ti'].xcom_push(key='file_info', value=json.dumps(file_info))
 
 
 download_failed_banks_file = PythonOperator(
@@ -60,4 +62,14 @@ download_failed_banks_file = PythonOperator(
 )
 
 
-download_failed_banks_file
+ddp_rest_api_file_info = SimpleHttpOperator(
+    task_id='ddp_rest_api_failed_bank_file_info',
+    method='POST',
+    http_conn_id='ddp-rest-api-conn',
+    endpoint='/bank/fileInfo',
+    data="{{ task_instance.xcom_pull(task_ids='download_failed_banks_file', key='file_info') }}",
+    headers={"Content-Type": "application/json"},
+    do_xcom_push=False,
+    dag=dag)
+
+download_failed_banks_file >> ddp_rest_api_file_info
