@@ -35,7 +35,7 @@ def _download_failed_banks_info(url: str, download_dir: str, **context):
         "url": url,
         "download_dir": download_dir,
         "filename": downloaded_filename,
-        "http_status": response.status_code
+        "http_code": response.status_code
     }
 
     if response.status_code == 200:
@@ -58,6 +58,7 @@ download_failed_banks_file = PythonOperator(
         "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
         "download_dir": "/app/data/landing/"
     },
+    do_xcom_push=True,
     dag=dag
 )
 
@@ -70,6 +71,7 @@ ddp_rest_api_file_info = SimpleHttpOperator(
     data="{{ task_instance.xcom_pull(task_ids='download_failed_banks_file', key='file_info') }}",
     headers={"Content-Type": "application/json"},
     do_xcom_push=False,
-    dag=dag)
+    dag=dag
+)
 
 download_failed_banks_file >> ddp_rest_api_file_info
