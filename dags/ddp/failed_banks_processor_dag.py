@@ -4,6 +4,7 @@ import requests
 import shutil
 from airflow import DAG
 
+from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
 
@@ -20,6 +21,7 @@ dag = DAG(
     catchup=False,
     max_active_runs=1,
     max_active_tasks=1,
+    template_searchpath="/app/scripts",
     default_args=default_args,
     tags=["ddp"]
 )
@@ -51,27 +53,37 @@ def _download_failed_banks_info(url: str, download_dir: str, **context):
     context['ti'].xcom_push(key='file_info', value=json.dumps(file_info))
 
 
-download_failed_banks_file = PythonOperator(
-    task_id="download_failed_banks_file",
-    python_callable=_download_failed_banks_info,
-    op_kwargs={
-        "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
-        "download_dir": "/app/data/landing/failed_banks"
-    },
-    do_xcom_push=True,
-    dag=dag
-)
+# download_failed_banks_file = PythonOperator(
+#     task_id="download_failed_banks_file",
+#     python_callable=_download_failed_banks_info,
+#     op_kwargs={
+#         "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
+#         "download_dir": "/app/data/landing/failed_banks"
+#     },
+#     do_xcom_push=True,
+#     dag=dag
+# )
+#
+#
+# ddp_rest_api_file_info = SimpleHttpOperator(
+#     task_id='ddp_rest_api_failed_bank_file_info',
+#     method='POST',
+#     http_conn_id='ddp-rest-api-conn',
+#     endpoint='/bank/fileInfo',
+#     data="{{ task_instance.xcom_pull(task_ids='download_failed_banks_file', key='file_info') }}",
+#     headers={"Content-Type": "application/json"},
+#     do_xcom_push=False,
+#     dag=dag
+# )
 
-
-ddp_rest_api_file_info = SimpleHttpOperator(
-    task_id='ddp_rest_api_failed_bank_file_info',
-    method='POST',
-    http_conn_id='ddp-rest-api-conn',
-    endpoint='/bank/fileInfo',
-    data="{{ task_instance.xcom_pull(task_ids='download_failed_banks_file', key='file_info') }}",
-    headers={"Content-Type": "application/json"},
+process_bank_files = BashOperator(
+    task_id='process_failed_bank_files',
+    bash_command="/process_banks_csv_files.sh",
+    # cwd="/app/scripts/",
     do_xcom_push=False,
     dag=dag
 )
 
-download_failed_banks_file >> ddp_rest_api_file_info
+# download_failed_banks_file >> ddp_rest_api_file_info >> process_bank_files
+
+process_bank_files

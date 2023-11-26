@@ -8,8 +8,6 @@ RUN pip install apache-airflow-providers-postgres \
     && pip install apache-airflow-providers-celery \
     && pip install --upgrade pip
 
-USER root
-
 ARG DB_URL
 ARG DB_USER
 ARG DB_PASS
@@ -23,6 +21,8 @@ ENV GROOVY_HOME=/opt/groovy
 ENV JAVA_HOME=/opt/java8
 ENV MAVEN_HOME=/opt/maven
 ENV SPARK_HOME=/opt/spark
+
+USER root
 
 RUN apt-get update \
     && apt-get upgrade -y \
@@ -69,9 +69,15 @@ RUN mkdir -p /app/scripts /app/data/landing/failed_banks /app/data/processed/fai
 COPY ../scripts/ /app/scripts
 COPY ../ddp-backend/ /app/ddp-backend
 
-RUN chmod 777 -R /app
+RUN chmod 777 -R /app && chown -R airflow /app
+
+USER airflow
+
+RUN find /app/scripts -type f -iname "*.sh" -exec chmod +x {} \;
 
 RUN mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
+
+USER root
 
 RUN apt-get update \
     && apt-get clean \
@@ -79,8 +85,6 @@ RUN apt-get update \
     && apt-get autoremove -y
 
 USER airflow
-
-RUN find /app/scripts -type f -iname "*.sh" -exec chmod +x {} \;
 
 WORKDIR /home/airflow
 
