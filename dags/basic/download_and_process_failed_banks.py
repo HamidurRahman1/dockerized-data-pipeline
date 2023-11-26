@@ -78,7 +78,7 @@ download_failed_banks_data = PythonOperator(
     python_callable=_download_failed_banks_info,
     op_kwargs={
         "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
-        "download_dir": "/data/landing/"
+        "download_dir": "/app/data/landing/"
     },
     dag=dag
 )
@@ -87,7 +87,7 @@ process_data = PythonOperator(
     task_id="process_failed_banks_data",
     python_callable=_process_failed_banks_data,
     op_kwargs={
-        "downloaded_data_dir": "/data/landing/"
+        "downloaded_data_dir": "/app/data/landing/"
     },
     dag=dag
 )

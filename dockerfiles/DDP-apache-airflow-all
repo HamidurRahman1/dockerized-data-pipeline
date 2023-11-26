@@ -63,14 +63,15 @@ RUN wget -q "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-
 
 ENV PATH $PATH:$SPARK_HOME/bin
 
-RUN mkdir -p /app/ddp-backend/ /app/jars/ddp-hibernate /app/jars/ddp-rest /app/jars/ddp-spark/lib \
-    && chmod 777 -R /app
+RUN mkdir -p /app/scripts /app/data/landing /app/data/processed /app/data/archive /app/ddp-backend/ \
+             /app/jars/ddp-hibernate /app/jars/ddp-rest /app/jars/ddp-spark/lib
 
+COPY ../scripts/ /app/scripts
 COPY ../ddp-backend/ /app/ddp-backend
 
-WORKDIR /app/ddp-backend
+RUN chmod 777 -R /app
 
-RUN mvn clean install -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
+RUN mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
 
 RUN apt-get update \
     && apt-get clean \
@@ -78,6 +79,8 @@ RUN apt-get update \
     && apt-get autoremove -y
 
 USER airflow
+
+RUN find /app/scripts -type f -iname "*.sh" -exec chmod +x {} \;
 
 WORKDIR /home/airflow
 
