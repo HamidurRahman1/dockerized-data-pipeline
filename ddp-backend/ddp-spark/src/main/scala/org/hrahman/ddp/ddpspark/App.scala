@@ -6,5 +6,7 @@ object App
 
         println("test")
 
+        println(System.getenv("saveToDatabase"))
+
     }
 }
