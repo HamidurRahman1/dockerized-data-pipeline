@@ -1,16 +1,22 @@
 # dockerized-data-pipeline
 
-Build the custom image by running `docker build -f ./dockerfiles/DDP-apache-airflow-all -t ddp-airflow-all:v1 . \
---build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db \
---build-arg DB_USER=ddp_user \
---build-arg DB_PASS=ddp_pass`
-and then run the compose file by running
-`docker-compose -f docker-compose-all.yml --env-file dev.env up`.
+* Steps to run:
 
-or spin up the simple one by running `docker build -f ./dockerfiles/DDP-apache-airflow -t ddp-airflow:v1 .`
-and then run the compose file by running
-`docker-compose --env-file dev.env up`.
-<h2>Work in progress ...</h2>
+1. Update <b>MOUNT_VOL</b> from <b>dev.env</b> file to your desired location.
 
+2. Build the custom image
+`docker build -f ./dockerfiles/DDP-apache-airflow-all -t ddp-airflow-all:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
+
+3. Spin up the compose file
+`docker-compose -f docker-compose-all.yml --env-file dev.env up`. 
+
+4. Finally, 
+exec into <b>ddp-airflow-webserver</b> container and run 
+`airflow connections add 'ddp_rest_api_conn' --conn-type 'http' --conn-host 'ddp-rest-api' --conn-port '7000'`
+
+
+* Airflow Webserver: http://localhost:8000/login/ (admin:admin)
+* Celery flower UI: http://localhost:9000/
+* DDP-rest-api: http://localhost:7000/
 
 
