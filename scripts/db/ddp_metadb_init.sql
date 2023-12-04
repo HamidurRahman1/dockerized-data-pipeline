@@ -10,6 +10,8 @@ create table if not exists failed_bank_file_info (
     url varchar,
     download_dir varchar,
     filename varchar,
-    http_code integer
+    http_code integer,
+    processor_flag char(1),
+    processed_dir varchar
 );
 

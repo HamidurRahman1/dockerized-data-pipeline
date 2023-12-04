@@ -15,7 +15,7 @@
   <name>ddp-spark</name>
 
   <properties>
-    <scala.compatibility.version>2.13</scala.compatibility.version>
+    <scala.compatibility.version>2.12</scala.compatibility.version>
     <scala.version>${scala.compatibility.version}.10</scala.version>
     <spark.version>3.3.1</spark.version>
   </properties>
@@ -110,7 +110,6 @@
               </resources>
             </configuration>
           </execution>
-
           <execution>
             <id>copy-ddp-spark-jar</id>
             <phase>package</phase>

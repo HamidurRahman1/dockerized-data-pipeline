@@ -15,12 +15,9 @@ x-airflow-common:
     AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
   volumes:
-    - ${MOUNT_VOL}/scripts:/app/scripts
-    - ${MOUNT_VOL}/data/landing:/app/data/landing
-    - ${MOUNT_VOL}/data/processed:/app/data/processed
-    - ${MOUNT_VOL}/data/archive:/app/data/archive
-    - ${MOUNT_VOL}/dags:/opt/airflow/dags
-    - ${MOUNT_VOL}/logs/airflow:/opt/airflow/logs
+    - ${MOUNT_VOL}/scripts:/app/scripts/
+    - ${MOUNT_VOL}/dags:/opt/airflow/dags/
+    - ${MOUNT_VOL}/logs/airflow:/opt/airflow/logs/
   depends_on:
     &airflow-metadb-depends-on
     airflow-postgres-metadb:

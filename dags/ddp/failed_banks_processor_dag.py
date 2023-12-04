@@ -37,7 +37,8 @@ def _download_failed_banks_info(url: str, download_dir: str, **context):
         "url": url,
         "download_dir": download_dir,
         "filename": downloaded_filename,
-        "http_code": response.status_code
+        "http_code": response.status_code,
+        "processor_flag": "U"
     }
 
     if response.status_code == 200:
@@ -58,7 +59,7 @@ download_failed_banks_file = PythonOperator(
     python_callable=_download_failed_banks_info,
     op_kwargs={
         "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
-        "download_dir": "/app/data/landing/failed_banks"
+        "download_dir": "/app/data/landing/failed_banks/"
     },
     do_xcom_push=True,
     dag=dag
@@ -83,7 +84,8 @@ process_bank_files = BashOperator(
     dag=dag,
     append_env=True,
     env={
-        "saveToDatabase": "true"
+        "fileCount": "16",
+        "processedDir": "/app/data/processed/failed_banks/"
     }
 )
 

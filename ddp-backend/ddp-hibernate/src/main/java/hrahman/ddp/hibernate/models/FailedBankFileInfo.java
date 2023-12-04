@@ -12,6 +12,8 @@ public class FailedBankFileInfo {
     private String downloadDir;
     private String fileName;
     private Integer httpStatusCode;
+    private Character processorFlag;
+    private String processedDir;
 
     @Id
     @Column(name = "id")
@@ -60,6 +62,24 @@ public class FailedBankFileInfo {
         this.httpStatusCode = httpStatusCode;
     }
 
+    @Column(name = "processor_flag", columnDefinition = "CHAR(1)", length = 1)
+    public Character getProcessorFlag() {
+        return processorFlag;
+    }
+
+    public void setProcessorFlag(Character processorFlag) {
+        this.processorFlag = processorFlag;
+    }
+
+    @Column(name = "processed_dir")
+    public String getProcessedDir() {
+        return processedDir;
+    }
+
+    public void setProcessedDir(String processedDir) {
+        this.processedDir = processedDir;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,12 +89,14 @@ public class FailedBankFileInfo {
                 && Objects.equals(url, that.url)
                 && Objects.equals(downloadDir, that.downloadDir)
                 && Objects.equals(fileName, that.fileName)
-                && Objects.equals(httpStatusCode, that.httpStatusCode);
+                && Objects.equals(httpStatusCode, that.httpStatusCode)
+                && Objects.equals(processorFlag, that.processorFlag)
+                && Objects.equals(processedDir, that.processedDir);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, url, downloadDir, fileName, httpStatusCode);
+        return Objects.hash(id, url, downloadDir, fileName, httpStatusCode, processorFlag, processedDir);
     }
 
     @Override
@@ -85,6 +107,8 @@ public class FailedBankFileInfo {
                 ", downloadDir='" + downloadDir + '\'' +
                 ", fileName='" + fileName + '\'' +
                 ", httpStatusCode=" + httpStatusCode +
+                ", processorFlag=" + processorFlag +
+                ", processedDir='" + processedDir + '\'' +
                 '}';
     }
 }
