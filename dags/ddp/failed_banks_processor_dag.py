@@ -16,12 +16,11 @@ default_args = {
 
 dag = DAG(
     dag_id="banks.failed_banks_processor",
-    start_date=datetime.datetime.now(),
+    start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     schedule_interval=None,
     catchup=False,
     max_active_runs=1,
     max_active_tasks=1,
-    template_searchpath="/app/scripts",
     default_args=default_args,
     tags=["ddp"]
 )
@@ -79,7 +78,7 @@ ddp_rest_api_file_info = SimpleHttpOperator(
 
 process_bank_files = BashOperator(
     task_id='process_failed_bank_files',
-    bash_command="/process_failed_banks_files.sh",
+    bash_command="/app/scripts/process_failed_banks_files.sh ",
     do_xcom_push=False,
     dag=dag,
     append_env=True,

@@ -2,13 +2,13 @@
 
 * Steps to run:
 
-1. Update <b>MOUNT_VOL</b> from <b>dev.env</b> file to your desired location.
+1. `cd` into project/repo directory.
 
 2. Build the custom image
-`docker build -f ./dockerfiles/DDP-apache-airflow-all -t ddp-airflow-all:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
+`docker build -f ./dockerfiles/ddp-airflow -t ddp-airflow:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
 
 3. Spin up the compose file
-`docker-compose -f docker-compose-all.yml --env-file dev.env up`. 
+`docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env up` 
 
 4. Finally, 
 exec into <b>ddp-airflow-webserver</b> container and run 
