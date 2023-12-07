@@ -13,7 +13,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="download_and_process_failed_banks",
+    dag_id="basic.download_and_process_failed_banks",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     # template_searchpath="/scripts",
     schedule_interval=None,

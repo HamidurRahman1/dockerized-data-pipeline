@@ -11,7 +11,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="print_datetime_differently",
+    dag_id="basic.print_datetime_differently",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     schedule_interval=datetime.timedelta(days=1),
     catchup=False,

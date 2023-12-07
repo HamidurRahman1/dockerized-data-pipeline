@@ -11,7 +11,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="check_versions",
+    dag_id="basic.check_versions",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     schedule_interval=datetime.timedelta(days=1),
     catchup=False,
