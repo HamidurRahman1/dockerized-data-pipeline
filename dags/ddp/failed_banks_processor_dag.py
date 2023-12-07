@@ -15,7 +15,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="banks.failed_banks_processor",
+    dag_id="ddp.failed_banks_processor",
     start_date=datetime.datetime.now() - datetime.timedelta(days=1),
     schedule_interval=None,
     catchup=False,
