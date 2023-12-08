@@ -75,6 +75,7 @@ ARG DB_PASS
 
 RUN mkdir -p /app/scripts/ /app/ddp-backend/ \
              /app/data/landing/failed_banks/ /app/data/processed/failed_banks/ /app/data/archive/failed_banks/ \
+             /app/data/landing/nyc_violations/ /app/data/processed/nyc_violations/ /app/data/archive/nyc_violations/ \
              /app/jars/ddp-hibernate/ /app/jars/ddp-rest/ /app/jars/ddp-spark/lib/
 
 COPY ../dags/ $AIRFLOW_HOME/dags/
