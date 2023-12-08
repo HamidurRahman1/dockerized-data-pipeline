@@ -1,4 +1,6 @@
 import datetime
+import json
+
 from airflow import DAG
 
 from airflow.operators.empty import EmptyOperator
@@ -25,7 +27,7 @@ dag = DAG(
 def handle_response(response):
     print("Response: " + str(response))
     print("Body: " + response.text)
-    return True if response.status_code == 202 and response.text.trim.lower() in "acknowledged" else False
+    return True if response.status_code == 202 and response.text.strip().lower() in "acknowledged" else False
 
 
 start = EmptyOperator(
@@ -38,12 +40,13 @@ download_nyc_parking_violations_file = SimpleHttpOperator(
     method='POST',
     http_conn_id='ddp_rest_api_conn',
     endpoint='/nyc/parking-camera/violations/download',
-    data={
+    data=json.dumps({
         "url": "https://data.cityofnewyork.us/resource/nc67-uf89.json?$limit=1000",
         "downloadDir": "/app/data/landing/nyc_violations/",
         "fileName": "nyc1k.json",
-        "saveMode": "backup"    # any value other than backup will override existing file if any. backup is timestamped
-    },
+        "mode": "backup",    # any value other than backup will override existing file if any
+        "backupDir": "/app/data/archive/nyc_violations/"
+    }),
     headers={"Content-Type": "application/json"},
     do_xcom_push=False,
     response_check=lambda response: handle_response(response),

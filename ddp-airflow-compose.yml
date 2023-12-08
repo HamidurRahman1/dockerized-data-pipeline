@@ -15,8 +15,14 @@ x-airflow-common:
     AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
   volumes:
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/landing/failed_banks/:/app/data/landing/failed_banks/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/processed/failed_banks/:/app/data/processed/failed_banks/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/archive/failed_banks/:/app/data/archive/failed_banks/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/landing/nyc_violations/:/app/data/landing/nyc_violations/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/processed/nyc_violations/:/app/data/processed/nyc_violations/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/archive/nyc_violations/:/app/data/archive/nyc_violations/
+    - ${MOUNT_VOL}/DELETABLE_MOUNT/logs/airflow:/opt/airflow/logs/
     - ./dags:/opt/airflow/dags/
-    - ./logs/airflow:/opt/airflow/logs/
   depends_on:
     &airflow-metadb-depends-on
     airflow-postgres-metadb:
@@ -39,7 +45,7 @@ services:
     ports:
       - "5000:5432"
     volumes:
-      - ./dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
+      - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
     restart: always
     networks:
       - ddp
@@ -56,7 +62,7 @@ services:
     ports:
       - "5050:5432"
     volumes:
-      - ./dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
+      - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
       - ./scripts/db/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
     networks:
@@ -104,7 +110,7 @@ services:
       - "6379:6379"
     command: redis-server
     volumes:
-      - ./dbdata/celery-redis-metadb:/data
+      - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/celery-redis-metadb:/data
     networks:
       - ddp
 
