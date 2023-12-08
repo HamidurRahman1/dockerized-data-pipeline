@@ -3,8 +3,11 @@ import json
 
 from airflow import DAG
 
+from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
+
+from airflow.sensors.filesystem import FileSensor
 
 default_args = {
     "owner": "Hamid",
@@ -53,4 +56,22 @@ download_nyc_parking_violations_file = SimpleHttpOperator(
     dag=dag
 )
 
-start >> download_nyc_parking_violations_file
+check_for_success_file = FileSensor(
+    task_id="check_for_success_file",
+    fs_conn_id="fs_local_conn",
+    filepath="/app/data/landing/nyc_violations/_success",
+    poke_interval=5,
+    timeout=60 * 5,
+    mode='reschedule'
+    # mode='poke'
+)
+
+after_success_file = BashOperator(
+    task_id='after_success_file',
+    bash_command="echo 'found success file'",
+    do_xcom_push=False,
+    dag=dag
+)
+
+start >> download_nyc_parking_violations_file >> check_for_success_file >> after_success_file
+
