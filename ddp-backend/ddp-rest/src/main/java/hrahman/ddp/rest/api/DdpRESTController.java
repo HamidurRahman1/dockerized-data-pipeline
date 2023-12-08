@@ -3,6 +3,7 @@ package hrahman.ddp.rest.api;
 import hrahman.ddp.hibernate.models.FailedBankFileInfo;
 import hrahman.ddp.hibernate.services.FailedBankFileInfoService;
 import hrahman.ddp.rest.dto.NYCViolationsFileInfo;
+import hrahman.ddp.rest.utils.Constants;
 import hrahman.ddp.rest.utils.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class DdpRESTController {
 
         Utilities.downloadNycViolationsFile(nycViolationsFileInfo);
 
-        return new ResponseEntity<>("Acknowledged", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(Constants.ACKNOWLEDGED, HttpStatus.ACCEPTED);
 
     }
 

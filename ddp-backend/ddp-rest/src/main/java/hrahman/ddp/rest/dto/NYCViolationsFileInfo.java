@@ -1,10 +1,14 @@
 package hrahman.ddp.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NYCViolationsFileInfo {
     private String url;
     private String downloadDir;
     private String fileName;
-    private String saveMode;
+    private String mode;
+    private String backupDir;
 
     public String getUrl() {
         return url;
@@ -30,12 +34,20 @@ public class NYCViolationsFileInfo {
         this.fileName = fileName;
     }
 
-    public String getSaveMode() {
-        return saveMode;
+    public String getMode() {
+        return mode;
     }
 
-    public void setSaveMode(String saveMode) {
-        this.saveMode = saveMode;
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    public String getBackupDir() {
+        return backupDir;
+    }
+
+    public void setBackupDir(String backupDir) {
+        this.backupDir = backupDir;
     }
 
     @Override
@@ -44,7 +56,8 @@ public class NYCViolationsFileInfo {
                 "url='" + url + '\'' +
                 ", downloadDir='" + downloadDir + '\'' +
                 ", fileName='" + fileName + '\'' +
-                ", saveMode='" + saveMode + '\'' +
+                ", mode='" + mode + '\'' +
+                ", backupDir='" + backupDir + '\'' +
                 '}';
     }
 }

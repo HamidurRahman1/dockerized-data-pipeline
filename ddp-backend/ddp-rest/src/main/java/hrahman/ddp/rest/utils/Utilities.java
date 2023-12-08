@@ -38,8 +38,10 @@ public final class Utilities {
             return;
         }
 
-        if (Files.exists(filePath.get()) && nycViolationsFileInfo.getSaveMode().equalsIgnoreCase("backup")) {
-            Path backupFile = Paths.get(filePath.get() + "_backup_" + LocalDateTime.now());
+        if (Files.exists(filePath.get()) && nycViolationsFileInfo.getMode().equalsIgnoreCase(Constants.SAVE_MODE)) {
+
+            Optional<Path> optionalBackupFile = join(nycViolationsFileInfo.getBackupDir(), nycViolationsFileInfo.getFileName());
+            Path backupFile = Paths.get(optionalBackupFile.get() + Constants.BACKUP + LocalDateTime.now());
             Files.move(filePath.get(), backupFile);
 
             System.out.println("backup created: " + backupFile);
@@ -56,6 +58,12 @@ public final class Utilities {
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, bytesRead);
             }
+        }
+
+        Optional<Path> success = join(nycViolationsFileInfo.getDownloadDir(), Constants.SUCCESS);
+
+        if (success.isPresent() && !Files.exists(success.get()) && Files.exists(filePath.get())) {
+            Files.createFile(success.get());
         }
     }
 
