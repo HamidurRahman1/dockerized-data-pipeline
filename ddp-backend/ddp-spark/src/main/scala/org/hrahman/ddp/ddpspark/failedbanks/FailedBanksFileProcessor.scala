@@ -8,6 +8,8 @@ import org.apache.spark.sql.{Row, SparkSession}
 import org.hrahman.ddp.ddpspark.utils.{SparkUtil, Utils}
 import org.springframework.context.support.ClassPathXmlApplicationContext
 
+case class FailedBankSchema(bankName: String, state: String, acquiringInstitution: String, closingDate: String, funds: Double)
+
 object FailedBanksFileProcessor {
 
   private val defaultOutputFileCount = 16
@@ -73,6 +75,8 @@ object FailedBanksFileProcessor {
 
       failedBankService.update(file)
     })
+
+    spark.stop()
   }
 
   private def readFile(spark: SparkSession, fileInfo: FailedBankFileInfo): RDD[Row] = {
@@ -87,5 +91,3 @@ object FailedBanksFileProcessor {
       .rdd
   }
 }
-
-case class FailedBankSchema(bankName: String, state: String, acquiringInstitution: String, closingDate: String, funds: Double)
