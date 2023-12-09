@@ -3,6 +3,7 @@ version: '3'
 x-airflow-common:
   &airflow-common
   environment:
+    &airflow-common-env
     AIRFLOW__CELERY__BROKER_URL: ${CELERY_BROKER_URL}
     AIRFLOW__CELERY__RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
@@ -72,16 +73,15 @@ services:
     <<: *airflow-common
     container_name: ${DDP_AF_PG_WEBSERVER_NAME}
     image: ddp-airflow:v1
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        airflow db init;
-        airflow connections add 'fs_local_conn' --conn-type 'fs' --conn-extra '{"path": "/"}';
-        airflow connections add 'ddp_rest_api_conn' --conn-type 'http' --conn-host 'ddp-rest-api' --conn-port '7000';
-        airflow users create --role ${AF_ROLE} --username ${AF_USERNAME} --password ${AF_PASS} \
-          --firstname ${AF_FIRSTNAME} --lastname ${AF_LASTNAME} --email ${AF_EMAIL};
-        airflow webserver >> /opt/airflow/logs/airflow-webserver.log 2>&1
+    entrypoint: /app/scripts/airflow/webserver_entrypoint.sh
+    environment:
+      <<: *airflow-common-env
+      AF_ROLE: ${AF_ROLE}
+      AF_USERNAME: ${AF_USERNAME}
+      AF_PASS: ${AF_PASS}
+      AF_FIRSTNAME: ${AF_FIRSTNAME}
+      AF_LASTNAME: ${AF_LASTNAME}
+      AF_EMAIL: ${AF_EMAIL}
     ports:
       - "8000:8080"
     restart: always
@@ -94,11 +94,8 @@ services:
     <<: *airflow-common
     container_name: ${DDP_AF_PG_SCHEDULER_NAME}
     image: ddp-airflow:v1
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        airflow scheduler;
+    entrypoint: airflow
+    command: scheduler
     restart: always
     depends_on:
       <<: *airflow-metadb-depends-on
@@ -123,11 +120,8 @@ services:
     restart: always
     depends_on:
       - airflow-scheduler
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        airflow celery worker;
+    entrypoint: airflow
+    command: celery worker
     networks:
       - ddp
 
@@ -140,11 +134,8 @@ services:
       - celery-worker-n1
     ports:
       - "9000:5555"
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        airflow celery flower;
+    entrypoint: airflow
+    command: celery flower
     networks:
       - ddp
 
@@ -155,7 +146,8 @@ services:
     entrypoint: /bin/bash
     command:
       - -c
-      - java -jar /app/jars/ddp-rest/ddp-rest-1.0.jar
+      - | 
+        java -jar /app/jars/ddp-rest/ddp-rest-1.0.jar
     restart: always
     depends_on:
       - ddp-postgres-metadb
