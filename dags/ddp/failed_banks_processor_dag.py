@@ -78,13 +78,14 @@ ddp_rest_api_file_info = SimpleHttpOperator(
 
 process_bank_files = BashOperator(
     task_id='process_failed_bank_files',
-    bash_command="/app/scripts/process_failed_banks_files.sh ",
+    bash_command="/app/scripts/ddp/process_failed_banks_files.sh ",
     do_xcom_push=False,
     dag=dag,
     append_env=True,
     env={
         "fileCount": "16",
-        "processedDir": "/app/data/processed/failed_banks/"
+        "processedDir": "/app/data/processed/failed_banks/",
+        "archivedDir": "/app/data/archive/failed_banks/"
     }
 )
 

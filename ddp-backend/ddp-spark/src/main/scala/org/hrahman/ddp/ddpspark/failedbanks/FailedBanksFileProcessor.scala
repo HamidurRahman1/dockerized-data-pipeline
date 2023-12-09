@@ -8,12 +8,15 @@ import org.apache.spark.sql.{Row, SparkSession}
 import org.hrahman.ddp.ddpspark.utils.{SparkUtil, Utils}
 import org.springframework.context.support.ClassPathXmlApplicationContext
 
+import java.nio.file.Files
+
 case class FailedBankSchema(bankName: String, state: String, acquiringInstitution: String, closingDate: String, funds: Double)
 
 object FailedBanksFileProcessor {
 
   private val defaultOutputFileCount = 16
   private val defaultSaveDir = "/tmp"
+  private val defaultArchiveDir = "/tmp"
 
   private val appContext = new ClassPathXmlApplicationContext("main-spark-config.xml")
 
@@ -28,6 +31,7 @@ object FailedBanksFileProcessor {
 
     val fileCount = System.getenv().getOrDefault("fileCount", s"$defaultOutputFileCount").toInt
     val processedDir = System.getenv().getOrDefault("processedDir", defaultSaveDir)
+    val archivedDir = System.getenv().getOrDefault("archivedDir", defaultArchiveDir)
     val masterUrl = System.getenv().getOrDefault("masterUrl", SparkUtil.defaultMaster)
 
     val failedBankService = appContext.getBean("failedBankFileInfoService").asInstanceOf[FailedBankFileInfoService]
@@ -61,7 +65,7 @@ object FailedBanksFileProcessor {
       })
         .map(data => s"${data.bankName},${data.state},${data.acquiringInstitution},${data.closingDate},${data.funds}")
 
-      val outputPath = Utils.getJoinedPath(processedDir, file.getFileName).toString
+      val outputPath = Utils.getJoinedPath(processedDir, file.getFileName.replace("unprocessed", "processed")).toString
 
       val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
       fs.delete(new Path(outputPath), true)
@@ -74,6 +78,10 @@ object FailedBanksFileProcessor {
       file.setProcessedDir(outputPath)
 
       failedBankService.update(file)
+
+      val sourcePath = Utils.getJoinedPath(file.getDownloadDir, file.getFileName)
+      val archivedPath = Utils.getJoinedPath(archivedDir, file.getFileName.replace("unprocessed", "archived"))
+      Files.move(sourcePath, archivedPath)
     })
 
     spark.stop()
