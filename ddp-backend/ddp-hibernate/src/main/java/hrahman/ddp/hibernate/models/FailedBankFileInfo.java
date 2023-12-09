@@ -1,11 +1,12 @@
 package hrahman.ddp.hibernate.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "failed_bank_file_info", schema = "ddp_schema")
-public class FailedBankFileInfo {
+public class FailedBankFileInfo implements Serializable {
 
     private Integer id;
     private String url;

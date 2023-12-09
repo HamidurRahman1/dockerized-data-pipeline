@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 failed_banks="failed_banks.csv"
 failed_banks_new="failed_banks_new.csv"

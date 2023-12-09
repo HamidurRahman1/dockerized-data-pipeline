@@ -8,15 +8,14 @@ import org.apache.spark.sql.{Row, SparkSession}
 import org.hrahman.ddp.ddpspark.utils.{SparkUtil, Utils}
 import org.springframework.context.support.ClassPathXmlApplicationContext
 
-import java.nio.file.Files
+import java.nio.file.{Files, Paths}
+import java.time.LocalDateTime
 
 case class FailedBankSchema(bankName: String, state: String, acquiringInstitution: String, closingDate: String, funds: Double)
 
 object FailedBanksFileProcessor {
 
   private val defaultOutputFileCount = 16
-  private val defaultSaveDir = "/tmp"
-  private val defaultArchiveDir = "/tmp"
 
   private val appContext = new ClassPathXmlApplicationContext("main-spark-config.xml")
 
@@ -30,8 +29,8 @@ object FailedBanksFileProcessor {
   private def process(): Unit = {
 
     val fileCount = System.getenv().getOrDefault("fileCount", s"$defaultOutputFileCount").toInt
-    val processedDir = System.getenv().getOrDefault("processedDir", defaultSaveDir)
-    val archivedDir = System.getenv().getOrDefault("archivedDir", defaultArchiveDir)
+    val processedDir = System.getenv().getOrDefault("processedDir", SparkUtil.defaultSaveDir)
+    val archivedDir = System.getenv().getOrDefault("archivedDir", SparkUtil.defaultArchiveDir)
     val masterUrl = System.getenv().getOrDefault("masterUrl", SparkUtil.defaultMaster)
 
     val failedBankService = appContext.getBean("failedBankFileInfoService").asInstanceOf[FailedBankFileInfoService]
@@ -67,15 +66,17 @@ object FailedBanksFileProcessor {
 
       val outputPath = Utils.getJoinedPath(processedDir, file.getFileName.replace("unprocessed", "processed")).toString
 
+      val writeModePath = if (Files.isDirectory(Paths.get(outputPath))) outputPath.concat(LocalDateTime.now().toString) else outputPath
+
       val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
       fs.delete(new Path(outputPath), true)
 
       csvFileDataRdd
         .repartition(fileCount)
-        .saveAsTextFile(outputPath)
+        .saveAsTextFile(writeModePath)
 
       file.setProcessorFlag('P')
-      file.setProcessedDir(outputPath)
+      file.setProcessedDir(writeModePath)
 
       failedBankService.update(file)
 

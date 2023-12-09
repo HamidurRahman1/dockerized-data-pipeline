@@ -15,3 +15,12 @@ create table if not exists failed_bank_file_info (
     processed_dir varchar
 );
 
+create table if not exists nyc_violation_analytics (
+    id serial primary key,
+    input_file varchar,
+    county_name varchar,
+    county_violations numeric,
+    precinct varchar,
+    precinct_avg_fine numeric
+);
+

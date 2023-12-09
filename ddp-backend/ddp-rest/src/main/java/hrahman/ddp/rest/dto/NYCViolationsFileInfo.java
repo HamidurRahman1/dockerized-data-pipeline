@@ -7,8 +7,6 @@ public class NYCViolationsFileInfo {
     private String url;
     private String downloadDir;
     private String fileName;
-    private String mode;
-    private String backupDir;
 
     public String getUrl() {
         return url;
@@ -34,30 +32,12 @@ public class NYCViolationsFileInfo {
         this.fileName = fileName;
     }
 
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    public String getBackupDir() {
-        return backupDir;
-    }
-
-    public void setBackupDir(String backupDir) {
-        this.backupDir = backupDir;
-    }
-
     @Override
     public String toString() {
         return "NYCViolationsFileInfo{" +
                 "url='" + url + '\'' +
                 ", downloadDir='" + downloadDir + '\'' +
                 ", fileName='" + fileName + '\'' +
-                ", mode='" + mode + '\'' +
-                ", backupDir='" + backupDir + '\'' +
                 '}';
     }
 }

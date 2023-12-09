@@ -66,12 +66,18 @@ check_for_success_file = FileSensor(
     # mode='poke'
 )
 
-after_success_file = BashOperator(
-    task_id='after_success_file',
-    bash_command="echo 'found success file'",
+process_nyc_camera_parking_violations_file = BashOperator(
+    task_id='process_nyc_camera_parking_violations_file',
+    bash_command="/app/scripts/ddp/process_nyc_violations_file.sh ",
     do_xcom_push=False,
-    dag=dag
+    dag=dag,
+    append_env=True,
+    env={
+        "filePath": "/app/data/landing/nyc_violations/nyc1k.json",
+        "processedDir": "/app/data/processed/nyc_violations/",
+        "archivedDir": "/app/data/archive/nyc_violations/"
+    }
 )
 
-start >> download_nyc_parking_violations_file >> check_for_success_file >> after_success_file
+start >> download_nyc_parking_violations_file >> check_for_success_file >> process_nyc_camera_parking_violations_file
 

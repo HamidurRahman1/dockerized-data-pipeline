@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.*;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public final class Utilities {
@@ -38,15 +37,6 @@ public final class Utilities {
             return;
         }
 
-        if (Files.exists(filePath.get()) && nycViolationsFileInfo.getMode().equalsIgnoreCase(Constants.SAVE_MODE)) {
-
-            Optional<Path> optionalBackupFile = join(nycViolationsFileInfo.getBackupDir(), nycViolationsFileInfo.getFileName());
-            Path backupFile = Paths.get(optionalBackupFile.get() + Constants.BACKUP + LocalDateTime.now());
-            Files.move(filePath.get(), backupFile);
-
-            System.out.println("backup created: " + backupFile);
-        }
-
         URL url = new URL(nycViolationsFileInfo.getUrl());
 
         try (InputStream inputStream = new BufferedInputStream(url.openStream());
@@ -61,6 +51,10 @@ public final class Utilities {
         }
 
         Optional<Path> success = join(nycViolationsFileInfo.getDownloadDir(), Constants.SUCCESS);
+
+        if (success.isPresent() && Files.exists(success.get())) {
+            Files.deleteIfExists(success.get());
+        }
 
         if (success.isPresent() && !Files.exists(success.get()) && Files.exists(filePath.get())) {
             Files.createFile(success.get());
