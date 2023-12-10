@@ -14,6 +14,8 @@
   `docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env up`
 
 * Airflow Webserver: http://localhost:8000/login/ (admin:admin)
+  * Invoke the DAG via REST API - 
+    * `curl -X 'POST' 'http://localhost:8000/api/v1/dags/basic.called_via_rest_api/dagRuns' -u "admin:admin" -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "conf": { "param1": "value 1", "param2": "value 2" } }'`
 * Celery flower UI: http://localhost:9000/
 * DDP-rest-api: http://localhost:7000/
 
