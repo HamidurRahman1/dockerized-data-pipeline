@@ -1,0 +1,14 @@
+{
+  "BANK_URL": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
+  "BANK_REST_ENDPOINT": "/bank/fileInfo",
+  "BANK_DOWNLOAD_DIR": "/app/data/landing/failed_banks/",
+  "BANK_ARCHIVE_DIR": "/app/data/archive/failed_banks/",
+  "BANK_PROCESSED_DIR": "/app/data/processed/failed_banks/",
+
+  "NYC_VIOLATIONS_URL": "https://data.cityofnewyork.us/resource/nc67-uf89.json?$limit=10000",
+  "NYC_VIOLATIONS_REST_ENDPOINT": "/nyc/parking-camera/violations/download",
+  "NYC_VIOLATIONS_SUCCESS_FILE": "/app/data/landing/nyc_violations/_success",
+  "NYC_VIOLATIONS_DOWNLOAD_DIR": "/app/data/landing/nyc_violations/",
+  "NYC_VIOLATIONS_ARCHIVE_DIR": "/app/data/archive/nyc_violations/",
+  "NYC_VIOLATIONS_PROCESSED_DIR": "/app/data/processed/nyc_violations/"
+}

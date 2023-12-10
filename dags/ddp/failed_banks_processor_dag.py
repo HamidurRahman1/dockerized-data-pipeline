@@ -2,7 +2,9 @@ import datetime
 import json
 import requests
 import shutil
+
 from airflow import DAG
+from airflow.models import Variable
 
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -57,8 +59,8 @@ download_failed_banks_file = PythonOperator(
     task_id="download_failed_banks_file",
     python_callable=_download_failed_banks_info,
     op_kwargs={
-        "url": "https://www.fdic.gov/bank/individual/failed/banklist.csv",
-        "download_dir": "/app/data/landing/failed_banks/"
+        "url": Variable.get("BANK_URL"),
+        "download_dir": Variable.get("BANK_DOWNLOAD_DIR")
     },
     do_xcom_push=True,
     dag=dag
@@ -69,7 +71,7 @@ ddp_rest_api_file_info = SimpleHttpOperator(
     task_id='ddp_rest_api_failed_bank_file_info',
     method='POST',
     http_conn_id='ddp_rest_api_conn',
-    endpoint='/bank/fileInfo',
+    endpoint=Variable.get("BANK_REST_ENDPOINT"),
     data="{{ task_instance.xcom_pull(task_ids='download_failed_banks_file', key='file_info') }}",
     headers={"Content-Type": "application/json"},
     do_xcom_push=False,
@@ -84,8 +86,8 @@ process_bank_files = BashOperator(
     append_env=True,
     env={
         "fileCount": "16",
-        "processedDir": "/app/data/processed/failed_banks/",
-        "archivedDir": "/app/data/archive/failed_banks/"
+        "processedDir": Variable.get("BANK_PROCESSED_DIR"),
+        "archivedDir": Variable.get("BANK_ARCHIVE_DIR")
     }
 )
 

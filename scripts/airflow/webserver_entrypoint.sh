@@ -2,6 +2,8 @@
 
 airflow db init;
 
+airflow variables import /app/scripts/airflow/variables.json;
+
 airflow connections add 'fs_local_conn' --conn-type 'fs' --conn-extra '{"path": "/"}';
 
 airflow connections add 'ddp_rest_api_conn' --conn-type 'http' --conn-host 'ddp-rest-api' --conn-port '7000';

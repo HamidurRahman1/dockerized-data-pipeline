@@ -1,7 +1,9 @@
-import datetime
+import os
 import json
+import datetime
 
 from airflow import DAG
+from airflow.models import Variable
 
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
@@ -14,6 +16,8 @@ default_args = {
     "retries": 1,
     "retry_delay": datetime.timedelta(minutes=5)
 }
+
+filename = "nyc_violations.json"
 
 dag = DAG(
     dag_id="ddp.nyc_parking_and_camera_violations",
@@ -44,11 +48,9 @@ download_nyc_parking_violations_file = SimpleHttpOperator(
     http_conn_id='ddp_rest_api_conn',
     endpoint='/nyc/parking-camera/violations/download',
     data=json.dumps({
-        "url": "https://data.cityofnewyork.us/resource/nc67-uf89.json?$limit=1000",
-        "downloadDir": "/app/data/landing/nyc_violations/",
-        "fileName": "nyc1k.json",
-        "mode": "backup",    # any value other than backup will override existing file if any
-        "backupDir": "/app/data/archive/nyc_violations/"
+        "url": Variable.get("NYC_VIOLATIONS_URL"),
+        "downloadDir": Variable.get("NYC_VIOLATIONS_DOWNLOAD_DIR"),
+        "fileName": filename
     }),
     headers={"Content-Type": "application/json"},
     do_xcom_push=False,
@@ -59,7 +61,7 @@ download_nyc_parking_violations_file = SimpleHttpOperator(
 check_for_success_file = FileSensor(
     task_id="check_for_success_file",
     fs_conn_id="fs_local_conn",
-    filepath="/app/data/landing/nyc_violations/_success",
+    filepath=Variable.get("NYC_VIOLATIONS_SUCCESS_FILE"),
     poke_interval=5,
     timeout=60 * 5,
     mode='reschedule'
@@ -73,9 +75,9 @@ process_nyc_camera_parking_violations_file = BashOperator(
     dag=dag,
     append_env=True,
     env={
-        "filePath": "/app/data/landing/nyc_violations/nyc1k.json",
-        "processedDir": "/app/data/processed/nyc_violations/",
-        "archivedDir": "/app/data/archive/nyc_violations/"
+        "filePath": os.path.join(Variable.get("NYC_VIOLATIONS_DOWNLOAD_DIR"), filename),
+        "processedDir": Variable.get("NYC_VIOLATIONS_PROCESSED_DIR"),
+        "archivedDir": Variable.get("NYC_VIOLATIONS_ARCHIVE_DIR")
     }
 )
 
