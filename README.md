@@ -13,10 +13,19 @@
   4. Spin up the compose file
   `docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env up`
 
-* Airflow Webserver: http://localhost:8000/login/ (admin:admin)
-  * Invoke a DAG via REST API - 
-    * `curl -X 'POST' 'http://localhost:8000/api/v1/dags/basic.called_via_rest_api/dagRuns' -u "admin:admin" -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "conf": { "param1": "value 1", "param2": "value 2" } }'`
-* Celery flower UI: http://localhost:9000/
-* DDP-rest-api: http://localhost:7000/
+  * Airflow Webserver: http://localhost:8000/login/ (admin:admin)
+    * You may trigger both `ddp.failed_banks_processor` and `ddp.nyc_parking_and_camera_violations` and head over to flower UI to see if scheduler has distributed the work to both worker node or not.
+    * Invoke the test REST API DAG - 
+      * `curl -X 'POST' 'http://localhost:8000/api/v1/dags/basic.called_via_rest_api/dagRuns' -u "admin:admin" -H 'accept: application/json' -H 'Content-Type: application/json' -d '{ "conf": { "param1": "value 1", "param2": "value 2" } }'`
+  * Celery flower UI: http://localhost:9000/
+  * DDP rest api: http://localhost:7000/
 
+
+* <b>Miscs:</b>
+  * Could have been done differently:
+    * Vault or similar for storing db credentials.
+    * Use `hdfs` instead of local file system.
+    * Logging instead of sout.
+    * Multi-stage docker build.
+    * Use LDAP for airflow webserver.
 

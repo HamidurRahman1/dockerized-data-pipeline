@@ -11,5 +11,5 @@ airflow connections add 'ddp_rest_api_conn' --conn-type 'http' --conn-host 'ddp-
 airflow users create --role ${AF_ROLE} --username ${AF_USERNAME} --password ${AF_PASS} \
   --firstname ${AF_FIRSTNAME} --lastname ${AF_LASTNAME} --email ${AF_EMAIL};
 
-airflow webserver >> ${AIRFLOW_HOME}/logs/airflow-webserver.log 2>&1
+airflow webserver;
 
