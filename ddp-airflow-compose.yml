@@ -125,6 +125,18 @@ services:
     networks:
       - ddp
 
+  celery-worker-n2:
+    <<: *airflow-common
+    container_name: ${DDP_CELERY_WORKER_2_NAME}
+    image: ddp-airflow:v1
+    restart: always
+    depends_on:
+      - airflow-scheduler
+    entrypoint: airflow
+    command: celery worker
+    networks:
+      - ddp
+
   celery-flower:
     <<: *airflow-common
     container_name: ${DDP_CELERY_FLOWER_NAME}
