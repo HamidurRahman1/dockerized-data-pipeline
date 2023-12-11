@@ -2,7 +2,7 @@
 
 airflow db init;
 
-airflow variables import /app/scripts/airflow/variables.json;
+airflow variables import ${AIRFLOW_HOME}/airflow-web-init/variables.json;
 
 airflow connections add 'fs_local_conn' --conn-type 'fs' --conn-extra '{"path": "/"}';
 

@@ -78,7 +78,7 @@ RUN mkdir -p /app/scripts/ /app/ddp-backend/ \
              /app/data/landing/nyc_violations/ /app/data/processed/nyc_violations/ /app/data/archive/nyc_violations/ \
              /app/jars/ddp-hibernate/ /app/jars/ddp-rest/ /app/jars/ddp-spark/lib/
 
-COPY ../dags/ $AIRFLOW_HOME/dags/
+COPY ../airflow/ $AIRFLOW_HOME/
 COPY ../scripts/ /app/scripts/
 COPY ../ddp-backend/ /app/ddp-backend/
 

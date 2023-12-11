@@ -24,7 +24,8 @@ x-airflow-common:
     - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/processed/nyc_violations/:/app/data/processed/nyc_violations/
     - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/archive/nyc_violations/:/app/data/archive/nyc_violations/
     - ${MOUNT_VOL}/DELETABLE_MOUNT/logs/airflow:/opt/airflow/logs/
-    - ./dags:/opt/airflow/dags/
+    - ./airflow/dags:/opt/airflow/dags/
+    - ./airflow/airflow-web-init:/opt/airflow/airflow-web-init
   depends_on:
     &airflow-metadb-depends-on
     airflow-postgres-metadb:
@@ -50,7 +51,7 @@ services:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
     restart: always
     networks:
-      - ddp
+      - ddp-network
 
   ddp-postgres-metadb:
     container_name: ${DDP_PG_METADB_NAME}
@@ -65,16 +66,16 @@ services:
       - "5050:5432"
     volumes:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
-      - ./scripts/db/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./setup/ddp-metadb-init/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
     networks:
-      - ddp
+      - ddp-network
 
   airflow-webserver:
     <<: *airflow-common
     container_name: ${DDP_AF_PG_WEBSERVER_NAME}
     image: ddp-airflow:v1
-    entrypoint: /app/scripts/airflow/webserver_entrypoint.sh
+    entrypoint: /bin/bash /opt/airflow/airflow-web-init/webserver_entrypoint.sh
     environment:
       <<: *airflow-common-env
       AF_ROLE: ${AF_ROLE}
@@ -89,7 +90,7 @@ services:
     depends_on:
       <<: *airflow-metadb-depends-on
     networks:
-      - ddp
+      - ddp-network
 
   airflow-scheduler:
     <<: *airflow-common
@@ -101,7 +102,7 @@ services:
     depends_on:
       <<: *airflow-metadb-depends-on
     networks:
-      - ddp
+      - ddp-network
 
   celery-redis:
     container_name: ${DDP_REDIS_NAME}
@@ -112,7 +113,7 @@ services:
     volumes:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/celery-redis-metadb:/data
     networks:
-      - ddp
+      - ddp-network
 
   celery-worker-n1:
     <<: *airflow-common
@@ -124,7 +125,7 @@ services:
     entrypoint: airflow
     command: celery worker
     networks:
-      - ddp
+      - ddp-network
 
   celery-worker-n2:
     <<: *airflow-common
@@ -136,7 +137,7 @@ services:
     entrypoint: airflow
     command: celery worker
     networks:
-      - ddp
+      - ddp-network
 
   celery-flower:
     <<: *airflow-common
@@ -150,7 +151,7 @@ services:
     entrypoint: airflow
     command: celery flower
     networks:
-      - ddp
+      - ddp-network
 
   ddp-rest-api:
     <<: *airflow-common
@@ -167,7 +168,7 @@ services:
     ports:
       - "7000:7000"
     networks:
-      - ddp
+      - ddp-network
 
 networks:
-  ddp:
+  ddp-network:

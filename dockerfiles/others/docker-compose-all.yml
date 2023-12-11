@@ -58,7 +58,7 @@ services:
       - "5050:5432"
     volumes:
       - ${MOUNT_VOL}/dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
-      - ${MOUNT_VOL}/scripts/db/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ${MOUNT_VOL}/scripts/ddp-metadb/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
     networks:
       - ddp
