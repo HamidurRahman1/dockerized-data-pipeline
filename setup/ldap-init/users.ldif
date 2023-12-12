@@ -1,0 +1,71 @@
+
+dn: ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: ddp-data
+dc: ddp-data
+
+dn: uid=hrahman,dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: hrahman
+cn: Hamidur Rahman
+sn: Rahman
+givenName: Hamidur
+displayName: Rahman, Hamidur
+uidNumber: 1110001
+gidNumber: 14564101
+loginShell: /bin/bash
+homeDirectory: /home/hrahman
+userPassword: hrahman1
+mail: hrahman@ddp.com
+o: ddp-data
+
+dn: uid=jdoe,dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+uid: jdoe
+cn: John Doe
+sn: Doe
+givenName: John
+displayName: Doe, John
+uidNumber: 1110002
+gidNumber: 14564102
+loginShell: /bin/bash
+homeDirectory: /home/jdoe
+userPassword: jdoe1
+mail: jdoe@ddp.com
+o: ddp-data
+
+dn: cn=admin,dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: admin
+description: Group for admins
+uniqueMember: uid=hrahman,dc=ddp-data,ou=people,dc=ddp,dc=com
+
+dn: cn=devs,dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: devs
+description: Groups for developers
+uniqueMember: uid=hrahman,dc=ddp-data,ou=people,dc=ddp,dc=com
+
+dn: cn=users,dc=ddp-data,ou=people,dc=ddp,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: users
+description: Groups for users(viewers)
+uniqueMember: uid=jdoe,dc=ddp-data,ou=people,dc=ddp,dc=com
