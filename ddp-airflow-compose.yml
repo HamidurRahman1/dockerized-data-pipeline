@@ -26,7 +26,6 @@ x-airflow-common:
     - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/archive/nyc_violations/:/app/data/archive/nyc_violations/
     - ${MOUNT_VOL}/DELETABLE_MOUNT/logs/airflow:/opt/airflow/logs/
     - ./airflow/dags:/opt/airflow/dags/
-    - ./airflow/airflow-web-init:/opt/airflow/airflow-web-init
   depends_on:
     &airflow-metadb-depends-on
     airflow-postgres-metadb:
@@ -43,9 +42,7 @@ services:
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASS}
       LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASS}
       LDAP_TLS: "false"
-#      LDAP_TLS_ENFORCE: "false"
-#      LDAP_TLS_VERIFY_CLIENT: "never"
-    command: /bin/bash /init/add_users.sh
+    command: /init/add_users.sh
     ports:
       - "389:389"
       - "636:636"
@@ -112,7 +109,7 @@ services:
     <<: *airflow-common
     container_name: ${DDP_AF_PG_WEBSERVER_NAME}
     image: ddp-airflow:v1
-    entrypoint: /bin/bash /opt/airflow/airflow-web-init/webserver_entrypoint.sh
+    entrypoint: /opt/airflow/airflow-web-init/webserver_entrypoint.sh
     environment:
       <<: *airflow-common-env
       LDAP_SERVER: ${LDAP_SERVER}
