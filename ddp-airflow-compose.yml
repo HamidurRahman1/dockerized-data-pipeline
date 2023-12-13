@@ -4,6 +4,7 @@ x-airflow-common:
   &airflow-common
   environment:
     &airflow-common-env
+    AIRFLOW_WWW_USER_CREATE: 'false'
     AIRFLOW__CELERY__BROKER_URL: ${CELERY_BROKER_URL}
     AIRFLOW__CELERY__RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AF_DB_URL}
@@ -15,7 +16,7 @@ x-airflow-common:
     AIRFLOW__CORE__DEFAULT_TIMEZONE: ${TMZ}
     AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: ${TMZ}
     AIRFLOW__API__ENABLE_EXPERIMENTAL_API: 'false'
-    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.session,airflow.api.auth.backend.basic_auth'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
   volumes:
     - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/landing/failed_banks/:/app/data/landing/failed_banks/
     - ${MOUNT_VOL}/DELETABLE_MOUNT/app/data/processed/failed_banks/:/app/data/processed/failed_banks/
@@ -34,35 +35,37 @@ x-airflow-common:
 services:
   ddp-openldap:
     image: osixia/openldap:1.5.0
-    container_name: ddp-openldap
+    container_name: ${DDP_LDAP_NAME}
     environment:
       LDAP_DOMAIN: "ddp.com"
       LDAP_BASE_DN: "dc=ddp,dc=com"
-      LDAP_ADMIN_PASSWORD: "admin"
       LDAP_ADMIN_USERNAME: "admin"
-      LDAP_CONFIG_PASSWORD: "admin"
-      LDAP_TLS: "true"
-      LDAP_TLS_ENFORCE: "false"
-      LDAP_TLS_VERIFY_CLIENT: "never"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASS}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASS}
+      LDAP_TLS: "false"
+#      LDAP_TLS_ENFORCE: "false"
+#      LDAP_TLS_VERIFY_CLIENT: "never"
     command: /bin/bash /init/add_users.sh
     ports:
       - "389:389"
       - "636:636"
     volumes:
       - ./setup/ldap-init:/init
+    restart: always
     networks:
       - ddp-network
 
   ddp-phpldapadmin:
     image: osixia/phpldapadmin:0.9.0
-    container_name: ddp-phpldapadmin
+    container_name: ${DDP_PHP_LDAP_NAME}
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ddp-openldap
+      PHPLDAPADMIN_LDAP_HOSTS: ${DDP_LDAP_NAME}
       PHPLDAPADMIN_HTTPS: false
     depends_on:
       - ddp-openldap
     ports:
       - "8001:80"
+    restart: always
     networks:
       - ddp-network
 
@@ -80,7 +83,7 @@ services:
       interval: 30s
       retries: 3
     ports:
-      - "5000:5432"
+      - "5001:5432"
     volumes:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/airflow-postgres-metadb:/var/lib/postgresql/data
     restart: always
@@ -97,7 +100,7 @@ services:
       TZ: ${TMZ}
       PGTZ: ${TMZ}
     ports:
-      - "5050:5432"
+      - "5002:5432"
     volumes:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
       - ./setup/ddp-metadb-init/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -112,12 +115,8 @@ services:
     entrypoint: /bin/bash /opt/airflow/airflow-web-init/webserver_entrypoint.sh
     environment:
       <<: *airflow-common-env
-      AF_ROLE: ${AF_ROLE}
-      AF_USERNAME: ${AF_USERNAME}
-      AF_PASS: ${AF_PASS}
-      AF_FIRSTNAME: ${AF_FIRSTNAME}
-      AF_LASTNAME: ${AF_LASTNAME}
-      AF_EMAIL: ${AF_EMAIL}
+      LDAP_SERVER: ${LDAP_SERVER}
+      LDAP_BIND_PASS: ${LDAP_BIND_PASS}
     ports:
       - "8000:8080"
     restart: always
@@ -191,11 +190,7 @@ services:
     <<: *airflow-common
     container_name: ${DDP_REST_API_NAME}
     image: ddp-airflow:v1
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - | 
-        java -jar /app/jars/ddp-rest/ddp-rest-1.0.jar
+    entrypoint: java -jar /app/jars/ddp-rest/ddp-rest-1.0.jar
     restart: always
     depends_on:
       - ddp-postgres-metadb
