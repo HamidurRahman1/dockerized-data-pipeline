@@ -47,7 +47,7 @@ services:
       - "389:389"
       - "636:636"
     volumes:
-      - ./setup/ldap-init:/init
+      - ./ldap/init:/init
     restart: always
     networks:
       - ddp-network
@@ -100,7 +100,7 @@ services:
       - "5002:5432"
     volumes:
       - ${MOUNT_VOL}/DELETABLE_MOUNT/dbdata/ddp-postgres-metadb:/var/lib/postgresql/data
-      - ./setup/ddp-metadb-init/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/ddp-metadb-init/ddp_metadb_init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
     networks:
       - ddp-network

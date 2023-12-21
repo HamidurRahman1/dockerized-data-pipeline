@@ -4,4 +4,4 @@ sleep 3
 
 ldapadd -x -H ldap:// -D "cn=admin,dc=ddp,dc=com" -f /init/users.ldif -w ${LDAP_ADMIN_PASSWORD}
 
-sleep infinity
+tail -f /dev/null
