@@ -17,7 +17,6 @@
 	<name>ddp-rest</name>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.hrahman.ddp</groupId>
 			<artifactId>ddp-hibernate</artifactId>
@@ -25,10 +24,15 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.hrahman.ddp</groupId>
+			<artifactId>ddp-vault</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -50,7 +54,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>/app/jars/ddp-rest</outputDirectory>
+							<outputDirectory>/Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/ddp-backend/app/jars/ddp-rest</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/target/</directory>
