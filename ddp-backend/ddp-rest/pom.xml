@@ -54,7 +54,7 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>/Users/hamidurrahman/Downloads/GitHub/dockerized-data-pipeline/ddp-backend/app/jars/ddp-rest</outputDirectory>
+							<outputDirectory>/app/jars/ddp-rest</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/target/</directory>
