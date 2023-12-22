@@ -4,6 +4,8 @@ x-airflow-common:
   &airflow-common
   environment:
     &airflow-common-env
+    VAULT_ADDR: ${VAULT_ADDR}
+    VAULT_TOKEN: ${VAULT_TOKEN}
     AIRFLOW_WWW_USER_CREATE: 'false'
     AIRFLOW__CELERY__BROKER_URL: ${CELERY_BROKER_URL}
     AIRFLOW__CELERY__RESULT_BACKEND: ${CELERY_RESULT_BACKEND}

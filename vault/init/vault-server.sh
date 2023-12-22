@@ -19,8 +19,7 @@ printf "%s\n" $unseal_keys > /v/keys/unseal-keys.txt
 
 root_token=$(echo "$init_output" | grep "Initial Root Token:" | awk '{print $4}' | tr -d '\n')
 
-echo "VAULT_ADDR=$VAULT_ADDR" > /v/keys/vault-info.env
-echo "VAULT_TOKEN=$root_token" >> /v/keys/vault-info.env
+echo "VAULT_TOKEN=$root_token" > /v/keys/vault-token.env
 
 vault operator unseal $(echo $unseal_keys | cut -d ' ' -f 1)
 vault operator unseal $(echo $unseal_keys | cut -d ' ' -f 2)
