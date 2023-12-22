@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd">
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <import resource="classpath:datasource-config.xml"/>
+    <context:component-scan base-package="org.hrahman.ddp.vault"/>
+
     <import resource="classpath:jpa-hibernate-config.xml"/>
+
+    <bean id="vaultBean" class="org.hrahman.ddp.vault.VaultPropertyRetriever"/>
+
+    <bean id="vaultDbProps" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="vaultBean"/>
+        <property name="targetMethod" value="getVaultProperties"/>
+        <property name="arguments">
+            <value>#{T(hrahman.ddp.hibernate.util.Constants).DDP_DB_PATH}</value>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="#{vaultDbProps.getProperty(T(hrahman.ddp.hibernate.util.Constants).DDP_DB_DRIVER)}"/>
+        <property name="url" value="#{vaultDbProps.getProperty(T(hrahman.ddp.hibernate.util.Constants).DDP_DB_URL)}"/>
+        <property name="username" value="#{vaultDbProps.getProperty(T(hrahman.ddp.hibernate.util.Constants).DDP_DB_USER)}"/>
+        <property name="password" value="#{vaultDbProps.getProperty(T(hrahman.ddp.hibernate.util.Constants).DDP_DB_PASS)}"/>
+    </bean>
 
 </beans>
