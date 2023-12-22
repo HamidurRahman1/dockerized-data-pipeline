@@ -4,9 +4,13 @@ services:
 
   ddp-vault:
     image: vault:1.13.3
-    container_name: ddp-vault
+    container_name: ${DDP_VAULT_NAME}
     environment:
       VAULT_ADDR: "http://0.0.0.0:8200"
+      DDP_DRIVER_CLASS: "org.postgresql.Driver"
+      DDP_DB_URL: jdbc:postgresql://${DDP_PG_METADB_NAME}:5432/${DDP_META_DB}
+      DDP_DB_USER: ${DDP_META_DB_USERNAME}
+      DDP_DB_PASS: ${DDP_META_DB_PASS}
     entrypoint: /bin/sh /v/init/vault-server.sh
     ports:
       - "8200:8200"

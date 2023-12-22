@@ -30,8 +30,10 @@ export VAULT_TOKEN=$root_token
 
 vault secrets enable -path=secret -version=1 kv
 
-vault kv put secret/test \
-  key1="value1" \
-  key2="value2"
+vault kv put secret/DDP-DB \
+  ddp_db_driver="${DDP_DRIVER_CLASS}" \
+  ddp_db_url="${DDP_DB_URL}" \
+  ddp_db_user="${DDP_DB_USER}" \
+  ddp_db_pass="${DDP_DB_PASS}"
 
 tail -f /dev/null
