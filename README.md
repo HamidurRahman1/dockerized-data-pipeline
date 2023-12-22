@@ -13,11 +13,15 @@
      2. Run the single stage dockerfile (image size: ~2.27 GB) - 
      `docker build -f ./dockerfiles/ddp-airflow -t ddp-airflow:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
 
-  4. Spin up the init compose file and wait for a couple of seconds - 
+  4. Spin up the init compose file and wait until vault server is up and running - 
   `docker-compose -f ./ddp-init-compose.yml --env-file dev.env up`
   
   5. Finally, spin up the airflow compose file - 
   `docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env up`
+
+
+* Vault UI: http://localhost:8200/
+  * Vault token is available in: `vault/vol/keys/vault-info.env`
 
 
 * PHP LDAP Admin: http://localhost:8001/
@@ -37,6 +41,6 @@
 * <b>Nice to have:</b>
   * <s>Multi-stage docker build.</s> (implemented)
   * <s>Use LDAP for airflow webserver.</s> (implemented)
-  * Vault or similar for storing database credentials.
+  * Vault or similar for storing database credentials. (in progress)
   * Logging instead of sout.
   * Use `hdfs` instead of local file system.

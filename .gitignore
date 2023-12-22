@@ -3,6 +3,7 @@ data/
 logs/
 plugins/
 dbdata/
+vault/vol
 
 
 .idea/

@@ -2,6 +2,23 @@ version: "3.5"
 
 services:
 
+  ddp-vault:
+    image: vault:1.13.3
+    container_name: ddp-vault
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    entrypoint: /bin/sh /v/init/vault-server.sh
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    volumes:
+      - ./vault/init:/v/init
+      - ./vault/vol/keys:/v/keys
+      - ./vault/vol/logs:/v/logs
+    restart: always
+    networks:
+      - ddp-network
+
   ddp-openldap:
     image: osixia/openldap:1.5.0
     container_name: ${DDP_LDAP_NAME}
