@@ -18,8 +18,10 @@
 
     <jpa:repositories base-package="hrahman.ddp.hibernate.repositories"/>
 
+<!--    dataSource bean will be provided by the modules (ddp-rest and ddp-spark) that depend on the ddp-hibernate module-->
+
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSourceBean" />
+        <property name="dataSource" ref="dataSource" />
         <property name="packagesToScan">
             <list>
                 <value>hrahman.ddp.hibernate.models</value>

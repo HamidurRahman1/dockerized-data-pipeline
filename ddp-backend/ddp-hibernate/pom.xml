@@ -15,14 +15,7 @@
     <version>1.0</version>
   </parent>
 
-  <properties>
-    <ddp.db.url/>
-    <ddp.db.user/>
-    <ddp.db.pass/>
-  </properties>
-
   <dependencies>
-
     <dependency>
       <groupId>javax.persistence</groupId>
       <artifactId>javax.persistence-api</artifactId>
@@ -53,19 +46,15 @@
       <version>42.6.0</version>
       <scope>runtime</scope>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-
     </plugins>
   </build>
-
 
 </project>

@@ -17,6 +17,7 @@
   </properties>
 
   <modules>
+    <module>ddp-vault</module>
     <module>ddp-hibernate</module>
     <module>ddp-rest</module>
     <module>ddp-spark</module>
