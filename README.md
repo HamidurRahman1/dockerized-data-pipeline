@@ -10,8 +10,8 @@
   3. Build one of the custom docker images (image name and tag is used in `ddp-airflow-compose.yml`) -
      1. Run the multi-stage dockerfile (image size: ~1.73 GB) - 
      `DOCKER_BUILDKIT=1 docker build -f ./dockerfiles/ddp-airflow-multi-stage -t ddp-airflow:v1 . --target=RUNTIME`
-     2. Run the single stage dockerfile (image size: ~2.27 GB) - 
-     `docker build -f ./dockerfiles/ddp-airflow -t ddp-airflow:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
+     2. Run the single stage dockerfile (image size: ~2.28 GB) - 
+     `docker build -f ./dockerfiles/ddp-airflow -t ddp-airflow:v1 .`
 
   4. Spin up the init compose file and wait until vault server is up and running - 
   `docker-compose -f ./ddp-init-compose.yml --env-file dev.env up`
@@ -21,7 +21,7 @@
 
 
 * Vault UI: http://localhost:8200/
-  * Vault token is available in: `vault/vol/keys/vault-info.env`
+  * Vault token is available in: `vault/vol/keys/vault-token.env`
 
 
 * PHP LDAP Admin: http://localhost:8001/

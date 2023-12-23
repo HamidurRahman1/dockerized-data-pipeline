@@ -56,6 +56,7 @@ RUN pip install \
         apache-airflow-providers-celery \
     && pip install --upgrade pip \
     && pip install --no-cache-dir connexion==2.14.2 \
+    && pip install pendulum==2.1.2 \
     && pip install python-ldap \
     && ln -s /usr/bin/python3 /usr/bin/python
 
@@ -72,11 +73,6 @@ ENV AIRFLOW_HOME $OPT_AIRFLOW
 
 
 # ==================================================================
-
-
-ARG DB_URL
-ARG DB_USER
-ARG DB_PASS
 
 RUN mkdir -p /app/scripts/ /app/ddp-backend/ \
              /app/data/landing/failed_banks/ /app/data/processed/failed_banks/ /app/data/archive/failed_banks/ \
@@ -100,7 +96,7 @@ USER $USER
 
 RUN find /app/scripts/ -type f -iname "*.sh" -exec chmod +x {} +
 
-RUN mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
+RUN mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests
 
 WORKDIR /home/$USER
 
