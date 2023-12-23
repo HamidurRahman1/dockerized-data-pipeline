@@ -1,8 +1,3 @@
-
-ARG DB_URL
-ARG DB_USER
-ARG DB_PASS
-
 ARG JAVA_VERSION=8
 ARG MAVEN_VERSION=3.8.4
 ARG SPARK_VERSION=3.3.1
@@ -83,10 +78,6 @@ RUN mkdir -p $OPT_AIRFLOW
 
 FROM ubuntu:22.04 AS BUILD
 
-ARG DB_URL
-ARG DB_USER
-ARG DB_PASS
-
 ARG OPT_JAVA
 ARG OPT_MAVEN
 ARG OPT_SPARK
@@ -107,7 +98,7 @@ COPY ../scripts/ /app/scripts/
 COPY ../ddp-backend/ /app/ddp-backend/
 
 RUN find /app/scripts/ -type f -iname "*.sh" -exec chmod +x {} + \
-    && mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests -Dddp.db.url=${DB_URL} -Dddp.db.user=${DB_USER} -Dddp.db.pass=${DB_PASS}
+    && mvn clean install -f /app/ddp-backend/pom.xml -Plocal -U -DskipTests
 
 # ==========================================================================================
 

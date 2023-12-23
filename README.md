@@ -9,7 +9,7 @@
 
   3. Build one of the custom docker images (image name and tag is used in `ddp-airflow-compose.yml`) -
      1. Run the multi-stage dockerfile (image size: ~1.73 GB) - 
-     `DOCKER_BUILDKIT=1 docker build -f ./dockerfiles/ddp-airflow-multi-stage -t ddp-airflow:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass --target=RUNTIME`
+     `DOCKER_BUILDKIT=1 docker build -f ./dockerfiles/ddp-airflow-multi-stage -t ddp-airflow:v1 . --target=RUNTIME`
      2. Run the single stage dockerfile (image size: ~2.27 GB) - 
      `docker build -f ./dockerfiles/ddp-airflow -t ddp-airflow:v1 . --build-arg DB_URL=jdbc:postgresql://ddp-postgres-metadb:5432/ddp_db --build-arg DB_USER=ddp_user --build-arg DB_PASS=ddp_pass`
 
@@ -17,7 +17,7 @@
   `docker-compose -f ./ddp-init-compose.yml --env-file dev.env up`
   
   5. Finally, spin up the airflow compose file - 
-  `docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env up`
+  `docker-compose -f ./ddp-airflow-compose.yml --env-file dev.env --env-file ./vault/vol/keys/vault-token.env up`
 
 
 * Vault UI: http://localhost:8200/
@@ -41,6 +41,6 @@
 * <b>Nice to have:</b>
   * <s>Multi-stage docker build.</s> (implemented)
   * <s>Use LDAP for airflow webserver.</s> (implemented)
-  * Vault or similar for storing database credentials. (in progress)
+  * <s>Vault or similar for storing database credentials.</s> (implemented)
   * Logging instead of sout.
   * Use `hdfs` instead of local file system.
